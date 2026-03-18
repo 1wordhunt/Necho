@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Echo | The Developer's Playground</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --bg: #313338; --sidebar: #1e1f22; --channels: #2b2d31; --text: #dbdee1; --accent: #5865f2; --danger: #da373c; --nitro: #ff73fa; }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+
+        /* GİRİŞ EKRANI (Auth Overlay) */
+        #authOverlay { position: fixed; inset: 0; background: #36393f; z-index: 999; display: flex; align-items: center; justify-content: center; }
+        .auth-card { background: #2f3136; padding: 32px; border-radius: 8px; width: 400px; text-align: center; box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
+        .auth-card input { width: 100%; padding: 10px; margin: 10px 0; background: #1e1f22; border: 1px solid #222; color: white; border-radius: 3px; }
+        .auth-card button { width: 100%; padding: 10px; background: var(--accent); color: white; border: none; cursor: pointer; border-radius: 3px; font-weight: bold; }
+
+        /* ANA YAPI */
+        .servers { width: 72px; background: var(--sidebar); display: flex; flex-direction: column; align-items: center; padding: 12px 0; gap: 8px; }
+        .srv-icon { width: 48px; height: 48px; background: #313338; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; position: relative; }
+        .srv-icon:hover { border-radius: 16px; background: var(--accent); }
+
+        .sidebar { width: 240px; background: var(--channels); display: flex; flex-direction: column; }
+        .sidebar-header { height: 48px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; font-weight: bold; border-bottom: 1px solid #1e1f22; }
+
+        .chat { flex: 1; display: flex; flex-direction: column; }
+        .msgs { flex: 1; overflow-y: auto; padding: 20px; }
+        .msg-item { display: flex; gap: 12px; margin-bottom: 16px; position: relative; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); }
+        .user-row { display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 15px; }
+        .role-badge { width: 16px; height: 16px; object-fit: contain; }
+        
+        /* MODALLAR (Profil, Rol, Ban) */
+        .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #232428; border: 1px solid #444; padding: 20px; border-radius: 8px; display: none; z-index: 100; width: 300px; }
+        .modal input { width: 100%; margin: 8px 0; padding: 8px; background: #1e1f22; border: 1px solid #333; color: white; }
+
+        .nitro-tag { color: var(--nitro); font-size: 12px; }
+        .input-area { padding: 0 20px 24px; }
+        .input-wrap { background: #383a40; border-radius: 8px; padding: 12px; display: flex; gap: 10px; }
+        .input-wrap input { background: transparent; border: none; color: white; flex: 1; outline: none; }
+    </style>
+</head>
+<body>
+
+    <div id="authOverlay">
+        <div class="auth-card">
+            <h2 id="authTitle">Echo'ya Hoş Geldin</h2>
+            <input type="email" id="email" placeholder="E-posta">
+            <input type="password" id="password" placeholder="Şifre">
+            <button onclick="handleAuth()" id="authBtn">Giriş Yap / Kayıt Ol</button>
+        </div>
+    </div>
+
+    <div class="servers">
+        <div class="srv-icon" onclick="openModal('serverModal')"><i class="fa-solid fa-plus"></i></div>
+    </div>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <span>SUNUCU</span>
+            <i class="fa-solid fa-chevron-down" onclick="openModal('roleModal')" style="cursor:pointer"></i>
+        </div>
+        <div style="flex:1; padding:10px;" id="chanList">
+            <div onclick="openModal('channelModal')" style="cursor:pointer; color:#8e9297">+ Kanal Ekle</div>
+        </div>
+        <div style="padding:10px; background:#232428;">
+            <button onclick="openModal('banModal')" style="width:100%; background:var(--danger); color:white; border:none; padding:5px; border-radius:3px; cursor:pointer">Ban Sistemi</button>
+        </div>
+    </div>
+
+    <div class="chat">
+        <div class="msgs" id="msgBox"></div>
+        <div class="input-area">
+            <div class="input-wrap">
+                <input type="text" id="chatInp" placeholder="Mesaj gönder...">
+            </div>
+        </div>
+    </div>
+
+    <div id="roleModal" class="modal">
+        <h3>Rol & Simge Oluştur</h3>
+        <input type="text" id="rName" placeholder="Rol İsmi">
+        <input type="text" id="rColor" placeholder="Renk Kodu (#ffffff)">
+        <input type="text" id="rIcon" placeholder="Simge URL veya Emoji">
+        <button onclick="saveRole()" style="background:var(--accent); color:white; border:none; width:100%; padding:8px;">Kaydet</button>
+    </div>
+
+    <div id="serverModal" class="modal">
+        <h3>Yeni Sunucu</h3>
+        <input type="text" id="sName" placeholder="Sunucu Adı">
+        <button onclick="alert('Sunucu Oluşturuldu')" style="background:var(--accent); color:white; border:none; width:100%; padding:8px;">Oluştur</button>
+    </div>
+
+    <div id="banModal" class="modal">
+        <h3>Kullanıcı Banla</h3>
+        <input type="text" id="bUser" placeholder="Kullanıcı ID">
+        <button onclick="alert('Kullanıcı Yasaklandı')" style="background:var(--danger); color:white; border:none; width:100%; padding:8px;">Banla</button>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCUu6aDjnchTXilQUQbnavxoE_Q8WXJ5X4",
+        authDomain: "echo-3cce2.firebaseapp.com",
+        projectId: "echo-3cce2",
+        storageBucket: "echo-3cce2.firebasestorage.app",
+        messagingSenderId: "1095210199802",
+        appId: "1:1095210199802:web:a72855cc124efb815eb743"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    // AUTH İŞLEMİ (Giriş yoksa kayıt eder)
+    window.handleAuth = async () => {
+        const email = document.getElementById('email').value;
+        const pass = document.getElementById('password').value;
+        try {
+            await signInWithEmailAndPassword(auth, email, pass);
+        } catch {
+            await createUserWithEmailAndPassword(auth, email, pass);
+        }
+    };
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) document.getElementById('authOverlay').style.display = 'none';
+    });
+
+    // MESAJ GÖNDERME
+    document.getElementById('chatInp').onkeypress = async (e) => {
+        if(e.key === 'Enter' && e.target.value.trim() !== "") {
+            await addDoc(collection(db, "messages"), {
+                text: e.target.value,
+                user: auth.currentUser.email.split('@')[0],
+                rIcon: localStorage.getItem('myIcon') || "💎", // Varsayılan Nitro/Simge
+                rColor: localStorage.getItem('myColor') || "#ffffff",
+                createdAt: serverTimestamp()
+            });
+            e.target.value = "";
+        }
+    };
+
+    // MESAJLARI VE ROLLERİ LİSTELE
+    onSnapshot(query(collection(db, "messages"), orderBy("createdAt", "asc")), (snap) => {
+        const box = document.getElementById('msgBox');
+        box.innerHTML = "";
+        snap.forEach(d => {
+            const m = d.data();
+            const icon = m.rIcon.startsWith('http') ? `<img src="${m.rIcon}" class="role-badge">` : `<span>${m.rIcon}</span>`;
+            box.innerHTML += `
+                <div class="msg-item">
+                    <div class="avatar"></div>
+                    <div class="msg-content">
+                        <div class="user-row">
+                            <span style="color:${m.rColor}">${m.user}</span>
+                            ${icon}
+                            <span class="nitro-tag">[NITRO]</span>
+                        </div>
+                        <div>${m.text}</div>
+                    </div>
+                </div>`;
+        });
+        box.scrollTop = box.scrollHeight;
+    });
+
+    // MODAL & ROL KAYDET
+    window.openModal = (id) => { document.getElementById(id).style.display = 'block'; };
+    window.saveRole = () => {
+        localStorage.setItem('myColor', document.getElementById('rColor').value);
+        localStorage.setItem('myIcon', document.getElementById('rIcon').value);
+        alert("Rol ve Simge Atandı!");
+        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+    };
+
+    window.onclick = (e) => { if(e.target.className === 'modal') e.target.style.display = 'none'; };
+</script>
+</body>
+</html>
