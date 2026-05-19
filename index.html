@@ -2,181 +2,131 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Echo | The Developer's Playground</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BURAK NET: PUBLIC AI MATRIX v10.1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #313338; --sidebar: #1e1f22; --channels: #2b2d31; --text: #dbdee1; --accent: #5865f2; --danger: #da373c; --nitro: #ff73fa; }
-        * { box-sizing: border-box; }
-        body { margin: 0; font-family: sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
-
-        /* GİRİŞ EKRANI (Auth Overlay) */
-        #authOverlay { position: fixed; inset: 0; background: #36393f; z-index: 999; display: flex; align-items: center; justify-content: center; }
-        .auth-card { background: #2f3136; padding: 32px; border-radius: 8px; width: 400px; text-align: center; box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
-        .auth-card input { width: 100%; padding: 10px; margin: 10px 0; background: #1e1f22; border: 1px solid #222; color: white; border-radius: 3px; }
-        .auth-card button { width: 100%; padding: 10px; background: var(--accent); color: white; border: none; cursor: pointer; border-radius: 3px; font-weight: bold; }
-
-        /* ANA YAPI */
-        .servers { width: 72px; background: var(--sidebar); display: flex; flex-direction: column; align-items: center; padding: 12px 0; gap: 8px; }
-        .srv-icon { width: 48px; height: 48px; background: #313338; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; position: relative; }
-        .srv-icon:hover { border-radius: 16px; background: var(--accent); }
-
-        .sidebar { width: 240px; background: var(--channels); display: flex; flex-direction: column; }
-        .sidebar-header { height: 48px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; font-weight: bold; border-bottom: 1px solid #1e1f22; }
-
-        .chat { flex: 1; display: flex; flex-direction: column; }
-        .msgs { flex: 1; overflow-y: auto; padding: 20px; }
-        .msg-item { display: flex; gap: 12px; margin-bottom: 16px; position: relative; }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); }
-        .user-row { display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 15px; }
-        .role-badge { width: 16px; height: 16px; object-fit: contain; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background: #010103; font-family: 'Share Tech Mono', monospace; color: #00ff66; }
         
-        /* MODALLAR (Profil, Rol, Ban) */
-        .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #232428; border: 1px solid #444; padding: 20px; border-radius: 8px; display: none; z-index: 100; width: 300px; }
-        .modal input { width: 100%; margin: 8px 0; padding: 8px; background: #1e1f22; border: 1px solid #333; color: white; }
+        .neon-glow { text-shadow: 0 0 10px #00ff66, 0 0 20px #00ff66; }
+        .cyber-border { border: 2px solid #00ff66; box-shadow: 0 0 15px rgba(0, 255, 102, 0.2); }
+        .alert-text { color: #ff0055; text-shadow: 0 0 10px #ff0055; }
 
-        .nitro-tag { color: var(--nitro); font-size: 12px; }
-        .input-area { padding: 0 20px 24px; }
-        .input-wrap { background: #383a40; border-radius: 8px; padding: 12px; display: flex; gap: 10px; }
-        .input-wrap input { background: transparent; border: none; color: white; flex: 1; outline: none; }
+        #main-container { display: flex; flex-direction: column; width: 100%; height: 100%; padding: 15px; }
+
+        #panel-header { text-align: center; font-family: 'Orbitron', sans-serif; padding: 10px; border-bottom: 2px dashed #00ff66; margin-bottom: 15px; position: relative; }
+        #dev-badge { position: absolute; top: 10px; right: 10px; background: #ff0055; color: #fff; font-size: 11px; font-weight: 900; padding: 3px 8px; border-radius: 3px; box-shadow: 0 0 8px #ff0055; }
+
+        #control-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(0, 255, 102, 0.03); padding: 10px; border-radius: 5px; margin-bottom: 15px; }
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        label { font-family: 'Orbitron', sans-serif; font-size: 10px; color: #fff; letter-spacing: 1px; }
+        input, select { background: #05050f; border: 1px solid #00ff66; color: #fff; padding: 10px; font-family: 'Share Tech Mono', monospace; font-size: 13px; outline: none; border-radius: 4px; }
+
+        #terminal-core { flex-grow: 1; overflow-y: auto; background: #020206; border: 1px solid rgba(0, 255, 102, 0.2); padding: 15px; border-radius: 5px; margin-bottom: 15px; font-size: 15px; }
+        .log-row { margin-bottom: 10px; line-height: 1.5; }
+        .user-log { color: #ffffff; font-weight: bold; border-left: 3px solid #ffffff; padding-left: 8px; }
+        .ai-log { color: #00ff66; border-left: 3px solid #00ff66; padding-left: 8px; }
+        .sys-log { color: #ff0055; font-weight: bold; }
+
+        #command-bar { display: flex; gap: 10px; }
+        #cmd-input { flex-grow: 1; background: #05050f; border: 1px solid #00ff66; color: #fff; padding: 12px; font-family: 'Share Tech Mono', monospace; font-size: 15px; border-radius: 4px; outline: none; }
+        #exec-btn { background: #00ff66; color: #000; border: none; font-family: 'Orbitron', sans-serif; font-weight: 900; padding: 0 25px; cursor: pointer; border-radius: 4px; transition: 0.3s; }
+        #exec-btn:hover { background: #fff; box-shadow: 0 0 15px #fff; }
     </style>
 </head>
 <body>
 
-    <div id="authOverlay">
-        <div class="auth-card">
-            <h2 id="authTitle">Echo'ya Hoş Geldin</h2>
-            <input type="email" id="email" placeholder="E-posta">
-            <input type="password" id="password" placeholder="Şifre">
-            <button onclick="handleAuth()" id="authBtn">Giriş Yap / Kayıt Ol</button>
+    <div id="main-container">
+        <div id="panel-header">
+            <h1 class="neon-glow" style="font-size: 26px; font-weight: 900; letter-spacing: 2px;">[ OMNISCIENT AI MATRIX ]</h1>
+            <p style="color: #66ffaa; font-size: 11px; margin-top: 5px; letter-spacing: 1px;">PUBLIC SUNGULARITY TERMINAL // READY FOR ALL USERS</p>
+            <div id="dev-badge">DEVELOPER BURAK</div>
         </div>
-    </div>
 
-    <div class="servers">
-        <div class="srv-icon" onclick="openModal('serverModal')"><i class="fa-solid fa-plus"></i></div>
-    </div>
-
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <span>SUNUCU</span>
-            <i class="fa-solid fa-chevron-down" onclick="openModal('roleModal')" style="cursor:pointer"></i>
-        </div>
-        <div style="flex:1; padding:10px;" id="chanList">
-            <div onclick="openModal('channelModal')" style="cursor:pointer; color:#8e9297">+ Kanal Ekle</div>
-        </div>
-        <div style="padding:10px; background:#232428;">
-            <button onclick="openModal('banModal')" style="width:100%; background:var(--danger); color:white; border:none; padding:5px; border-radius:3px; cursor:pointer">Ban Sistemi</button>
-        </div>
-    </div>
-
-    <div class="chat">
-        <div class="msgs" id="msgBox"></div>
-        <div class="input-area">
-            <div class="input-wrap">
-                <input type="text" id="chatInp" placeholder="Mesaj gönder...">
+        <div id="control-grid" class="cyber-border">
+            <div class="input-group">
+                <label>SİSTEM ENTEGRASYONU</label>
+                <input type="text" value="TEST API KEY (GÖMÜLÜ)" disabled style="color: #00ff66; border-color: rgba(0,255,102,0.3);">
+            </div>
+            <div class="input-group">
+                <label>AKTİF YAPAY ZEKÂ BEYNİ (MODEL)</label>
+                <select id="neural-model">
+                    <option value="google/gemini-2.5-flash">Gemini 2.5 Flash (Işık Hızında Analiz)</option>
+                    <option value="openai/gpt-4o-mini">GPT-4o Mini (Hızlı Siber Akıl)</option>
+                    <option value="meta-llama/llama-3-8b-instruct">Llama 3 8B (Hızlı Kod Devi)</option>
+                </select>
             </div>
         </div>
+
+        <div id="terminal-core">
+            <div class="log-row sys-log">>>> [SİSTEM BAŞLATILDI]: Herkese açık yapay zeka ağı test modu aktif.</div>
+            <div class="log-row ai-log">>>> OmniMatrix: Hoş geldiniz kullanıcılar. Bu sistem Developer Burak tarafından test sürümü olarak yayına alınmıştır. Bir emir gönderin...</div>
+        </div>
+
+        <div id="command-bar">
+            <input type="text" id="cmd-input" placeholder="Yapay zeka matrisine ortak bir emir gönderin..." autocomplete="off">
+            <button id="exec-btn">EMRİ ÇALIŞTIR</button>
+        </div>
     </div>
 
-    <div id="roleModal" class="modal">
-        <h3>Rol & Simge Oluştur</h3>
-        <input type="text" id="rName" placeholder="Rol İsmi">
-        <input type="text" id="rColor" placeholder="Renk Kodu (#ffffff)">
-        <input type="text" id="rIcon" placeholder="Simge URL veya Emoji">
-        <button onclick="saveRole()" style="background:var(--accent); color:white; border:none; width:100%; padding:8px;">Kaydet</button>
-    </div>
+    <script>
+        const terminalCore = document.getElementById('terminal-core');
+        const cmdInput = document.getElementById('cmd-input');
+        const execBtn = document.getElementById('exec-btn');
+        const neuralModel = document.getElementById('neural-model');
 
-    <div id="serverModal" class="modal">
-        <h3>Yeni Sunucu</h3>
-        <input type="text" id="sName" placeholder="Sunucu Adı">
-        <button onclick="alert('Sunucu Oluşturuldu')" style="background:var(--accent); color:white; border:none; width:100%; padding:8px;">Oluştur</button>
-    </div>
+        // --- ENTEGRE TEST ANAHTARI ---
+        const testApiKey = "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"; 
 
-    <div id="banModal" class="modal">
-        <h3>Kullanıcı Banla</h3>
-        <input type="text" id="bUser" placeholder="Kullanıcı ID">
-        <button onclick="alert('Kullanıcı Yasaklandı')" style="background:var(--danger); color:white; border:none; width:100%; padding:8px;">Banla</button>
-    </div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyCUu6aDjnchTXilQUQbnavxoE_Q8WXJ5X4",
-        authDomain: "echo-3cce2.firebaseapp.com",
-        projectId: "echo-3cce2",
-        storageBucket: "echo-3cce2.firebasestorage.app",
-        messagingSenderId: "1095210199802",
-        appId: "1:1095210199802:web:a72855cc124efb815eb743"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-
-    // AUTH İŞLEMİ (Giriş yoksa kayıt eder)
-    window.handleAuth = async () => {
-        const email = document.getElementById('email').value;
-        const pass = document.getElementById('password').value;
-        try {
-            await signInWithEmailAndPassword(auth, email, pass);
-        } catch {
-            await createUserWithEmailAndPassword(auth, email, pass);
+        function pushLog(text, type) {
+            const div = document.createElement('div');
+            div.className = `log-row ${type}`;
+            div.textContent = type === 'user-log' ? `[USER]: ${text}` : `>>> ${text}`;
+            terminalCore.appendChild(div);
+            terminalCore.scrollTop = terminalCore.scrollHeight;
         }
-    };
 
-    onAuthStateChanged(auth, (user) => {
-        if (user) document.getElementById('authOverlay').style.display = 'none';
-    });
+        async function triggerMatrixAI() {
+            const query = cmdInput.value.trim();
+            const selectedBrain = neuralModel.value;
 
-    // MESAJ GÖNDERME
-    document.getElementById('chatInp').onkeypress = async (e) => {
-        if(e.key === 'Enter' && e.target.value.trim() !== "") {
-            await addDoc(collection(db, "messages"), {
-                text: e.target.value,
-                user: auth.currentUser.email.split('@')[0],
-                rIcon: localStorage.getItem('myIcon') || "💎", // Varsayılan Nitro/Simge
-                rColor: localStorage.getItem('myColor') || "#ffffff",
-                createdAt: serverTimestamp()
-            });
-            e.target.value = "";
+            if(!query) return;
+
+            pushLog(query, "user-log");
+            cmdInput.value = '';
+            pushLog("Küresel yapay zeka matrisine bağlanılıyor...", "ai-log");
+
+            try {
+                const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${testApiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: selectedBrain,
+                        messages: [{ role: "user", content: query }]
+                    })
+                });
+
+                const data = await response.json();
+                
+                if(data.choices && data.choices[0]) {
+                    const aiReply = data.choices[0].message.content;
+                    pushLog(aiReply, "ai-log");
+                } else {
+                    pushLog("SİSTEM UYARISI: Sunucudan veri alınamadı. Anahtar limitini veya durumunu kontrol edin.", "sys-log");
+                }
+
+            } catch (error) {
+                pushLog("BAĞLANTI KOPTU: Sunucu protokol hatası veya anahtar kilitlendi.", "sys-log");
+                console.error(error);
+            }
         }
-    };
 
-    // MESAJLARI VE ROLLERİ LİSTELE
-    onSnapshot(query(collection(db, "messages"), orderBy("createdAt", "asc")), (snap) => {
-        const box = document.getElementById('msgBox');
-        box.innerHTML = "";
-        snap.forEach(d => {
-            const m = d.data();
-            const icon = m.rIcon.startsWith('http') ? `<img src="${m.rIcon}" class="role-badge">` : `<span>${m.rIcon}</span>`;
-            box.innerHTML += `
-                <div class="msg-item">
-                    <div class="avatar"></div>
-                    <div class="msg-content">
-                        <div class="user-row">
-                            <span style="color:${m.rColor}">${m.user}</span>
-                            ${icon}
-                            <span class="nitro-tag">[NITRO]</span>
-                        </div>
-                        <div>${m.text}</div>
-                    </div>
-                </div>`;
-        });
-        box.scrollTop = box.scrollHeight;
-    });
-
-    // MODAL & ROL KAYDET
-    window.openModal = (id) => { document.getElementById(id).style.display = 'block'; };
-    window.saveRole = () => {
-        localStorage.setItem('myColor', document.getElementById('rColor').value);
-        localStorage.setItem('myIcon', document.getElementById('rIcon').value);
-        alert("Rol ve Simge Atandı!");
-        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
-    };
-
-    window.onclick = (e) => { if(e.target.className === 'modal') e.target.style.display = 'none'; };
-</script>
+        execBtn.addEventListener('click', triggerMatrixAI);
+        cmdInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') triggerMatrixAI(); });
+    </script>
 </body>
 </html>
